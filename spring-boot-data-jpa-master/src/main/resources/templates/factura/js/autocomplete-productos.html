@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org" lang="en">
+
+<body>
+<!--javascript para autocompletar los productos-->
+<script type="text/javascript" th:fragment="javascript">
+    $(document).ready(function(){
+        $("#buscar_producto").autocomplete({
+            source: function(request,response){
+                $.ajax({
+                    url: "/factura/cargar-productos/" + request.term,
+                    dataType: "json",
+                    data:{
+                        term: request.term
+                    },
+                    success: function(data){
+                        response($.map(data,function(item){
+                            return {
+                            value: item.id,
+                            label : item.nombre,
+                            precio: item.precio
+                        };
+                        }));
+                    },
+                });
+            },
+            select: function(event, ui){
+                //$("#buscar_producto").val(ui.item.label);
+                if(itemsHelper.hasProducto(ui.item.value)){
+                    itemsHelper.incrementaCantidad(ui.item.value,ui.item.precio);
+                    return false;
+                }
+
+                var linea = $("#plantillaItemsFactura").html();//obtenemos el contenido html atraves del id
+                //ahora reemplazamos el parametro nombre precio por el valor
+                linea = linea.replace(/{ID}/g, ui.item.value);
+                linea = linea.replace(/{NOMBRE}/g, ui.item.label);
+                linea = linea.replace(/{PRECIO}/g, ui.item.precio);
+                //hacemos referencia a la tabbble pero su tbody que dejamos vacio en form
+                $("#cargarItemProductos tbody").append(linea);
+                /*En resumen obtenemos la plantilla, el contenido html, cambiamos los parametros por el valor(id,nombre,precio)
+                *y agregamos la linea al tbody de la tabla */
+                //llamamos la funcion helper
+                itemsHelper.calcularImporte(ui.item.value,ui.item.precio,1);
+
+                return false;
+            }
+        });
+        $("form").submit(function(){//cuando se envia(submit)
+            $("#plantillaItemsFactura").remove();
+            return;//sin este metodo cuando se envie se tomara el id de la plantilla como un item mas y genera error
+        });
+    });
+    // este es un objeto con metodos de ayuda, por  ejemplo calular el importe o eliminar una linea de la factura
+
+    var itemsHelper = {
+        calcularImporte: function(id,precio, cantidad){
+            $("#total_importe_" + id).html(parseInt(precio)*parseInt(cantidad));//el metodo .html nos permite agregar contenido
+            this.calcularGranTotal();
+        },
+        hasProducto: function(id){ //funcion que se encarga de buscar linea por linea en el detalle de la factura  si existe el ide del producto
+            //hago referencia al objeto input en el html
+            var resultado = false;
+            $('input[name="item_id[]"]').each(function(){
+                if(parseInt(id)== parseInt($(this).val())){
+                    resultado =true;
+                }
+            });
+            return resultado;
+
+
+        },
+        incrementaCantidad : function(id,precio){
+            var cantidad =$("#cantidad_"+ id).val() ? parseInt($("#cantidad_"+ id).val()) : 0;
+            $("#cantidad_"+ id).val(++cantidad);
+            this.calcularImporte(id,precio,cantidad);
+        },
+
+        eliminarLineaFactura: function(id){
+            $("#row_"+id).remove();
+            this.calcularGranTotal();
+        },
+
+        calcularGranTotal: function(){
+            var total=0;
+
+            $('span[id^="total_importe_"]').each(function(){
+                total += parseInt($(this).html());//inyecta en le html este valor
+            });
+            $('#gran_total').html(total);//le pasamos el total al id gran_total
+        }
+
+
+
+    }
+</script>
+</body>
+</html>
