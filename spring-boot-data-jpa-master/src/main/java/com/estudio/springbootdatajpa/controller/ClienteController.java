@@ -12,6 +12,7 @@ import org.apache.juli.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
@@ -41,6 +42,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -60,13 +62,16 @@ public class ClienteController {
     @Autowired
     private IUploadFileService uploadFileService;
 
+    @Autowired
+    private MessageSource messageSource;
+
     //Metodo para ver el detalle a travez del id
     @Secured("ROLE_USER")
     @GetMapping(value = "/ver/{id}")
-    public String ver(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
+    public String ver(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash, Locale locale) {
         Cliente cliente = clienteService.fetchByIdWithFacturas(id);//clienteService.findOne(id);
         if (cliente == null) {
-            flash.addFlashAttribute("error", cliente);
+            flash.addFlashAttribute("error", messageSource.getMessage("text.cliente.flash.db.error", null, locale));
             return "redirect:/listar";
         }
         model.put("cliente", cliente);
