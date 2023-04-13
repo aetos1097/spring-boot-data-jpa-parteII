@@ -31,7 +31,7 @@
                 <li class="list-group-item" th:text="#{text.cliente.factura.fecha} + ': ' + ${factura.createAt}"></li>
 
             </ul>
-            <div class="alert alert-info my-4" th:if="${#lists.isEmpty(factura.items)}"
+            <div class="alert alert-info my-6" th:if="${#lists.isEmpty(factura.items)}"
                  th:text="#{text.factura.ver.no.lineas} + ' ' + ${factura.descripcion}">
 
             </div>
