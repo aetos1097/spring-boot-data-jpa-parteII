@@ -75,7 +75,7 @@ public class ClienteController {
             return "redirect:/listar";
         }
         model.put("cliente", cliente);
-        model.put("titulo", "Detalle cliente: " + cliente.getNombre());
+        model.put("titulo", messageSource.getMessage("text.cliente.detalle.titulo", null, locale).concat(": ").concat(cliente.getNombre()));
         return "ver";
     }
 
@@ -85,7 +85,8 @@ public class ClienteController {
     @RequestMapping(value = {"/listar", "/"}, method = RequestMethod.GET)//lo mismo que el get
     public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model,
                          Authentication authentication,
-                         HttpServletRequest request) {
+                         HttpServletRequest request,
+                         Locale locale) {
 
         //validacion de autenticacion
         if (authentication != null) {
@@ -114,7 +115,7 @@ public class ClienteController {
         Page<Cliente> clientes = clienteService.findAll(pageRequest);//realizamos el servicio de filtrado
         PageRender<Cliente> pageRender = new PageRender<>("/listar", clientes);
 
-        model.addAttribute("titulo", "Listado de Clientes");
+        model.addAttribute("titulo", messageSource.getMessage("text.cliente.listar.titulo", null, locale));
         model.addAttribute("clientes", clientes);
         model.addAttribute("page", pageRender);
         // ya no se usa esta linea porque se quiere traer pero paginar los clientes model.addAttribute("clientes",clienteService.findAll());
@@ -141,39 +142,40 @@ public class ClienteController {
     //crear elementos
     @Secured("ROLE_ADMIN")
     @GetMapping("/form")
-    public String crear(Map<String, Object> model) {
+    public String crear(Map<String, Object> model, Locale locale) {
         Cliente cliente = new Cliente();//creo una nueva instancia
 
         model.put("cliente", cliente);
-        model.put("titulo", "Formulario de cliente");
+        model.put("titulo", messageSource.getMessage("text.cliente.form.titulo.crear", null, locale));
         return "form";
     }
 
     @Secured("ROLE_ADMIN")
     //agregar o editar un elemento
     @GetMapping("/form/{id}")
-    public String editar(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
+    public String editar(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash,Locale locale) {
         Cliente cliente = null;
         //validamos que el id sea mayor 0
         if (id > 0) {
             cliente = clienteService.findOne(id);//me encuentra el valor del id que se pasa en la request
             if (cliente == null) {
-                flash.addFlashAttribute("error", "El id del cliente no existe en la base de datos");
+                flash.addFlashAttribute("error", messageSource.getMessage("text.cliente.flash.db.error", null, locale));
                 return "redirect:/listar";
             }
         } else {
-            flash.addFlashAttribute("error", "El id del cliente no puede ser 0");
+            flash.addFlashAttribute("error", messageSource.getMessage("text.cliente.flash.id.error", null, locale));
             return "redirect:/listar";
         }
         model.put("cliente", cliente);
-        model.put("titulo", "Editar cliente");
+        model.put("titulo", messageSource.getMessage("text.cliente.form.titulo.editar", null, locale));
         return "form";
     }
 
     @Secured("ROLE_ADMIN")
     //guardamos los elementos
     @PostMapping("/form")
-    public String guardar(@Valid Cliente cliente, BindingResult result, Model model, @RequestParam("file") MultipartFile foto, RedirectAttributes flash, SessionStatus status) {//colocamos la anotacion Valid en el argumento porque sera lo que se envia y debe estar validado
+    public String guardar(@Valid Cliente cliente, BindingResult result, Model model, @RequestParam("file") MultipartFile foto,
+                          RedirectAttributes flash, SessionStatus status, Locale locale) {//colocamos la anotacion Valid en el argumento porque sera lo que se envia y debe estar validado
         /*Siempre van juntos El objeto con @Valid y el BindingResult y de resto lo demas
          El BindinfResult es una interfaz que captura los errores en las validaciones
         Ahora validamos con un if si hay algun error en los campos del formulario*/
@@ -181,7 +183,7 @@ public class ClienteController {
             /*si el objeto se llama igual que en el formulario con metodo get entonces se pasa automatico
             //si no se debe poner en los argumentos :(@Valid @ModelAttribute Cliente cliente, BindingResult result,Model model)
             @RequestParam("file")MultipartFile foto->parametro para inyectar una imagen al html*/
-            model.addAttribute("titulo", "Formulario Cliente");
+            model.addAttribute("titulo", messageSource.getMessage("text.cliente.form.titulo", null, locale));
             return "form";//si hay errores nos devolvemos al formulario con ruta /form
         }
         //Agregar una Foto
@@ -200,12 +202,12 @@ public class ClienteController {
                 e.printStackTrace();
             }
             //Path directorioRecursos es para indicar donde se guardaran nuestras imagenes
-            flash.addFlashAttribute("info", "Has subido correctamente " + foto.getOriginalFilename() + "");//mensaje de exito
+            flash.addFlashAttribute("info", messageSource.getMessage("text.cliente.flash.foto.subir.success", null, locale) + "'" + uniqueFilename + "'");//mensaje de exito
             cliente.setFoto(uniqueFilename);//pasamos el nombre dela foto al cliente, queda guardada en la db
 
         }
         //Crear Cliente
-        String mensajeFlash = (cliente.getId() != null) ? "Cliente editado con Exito!" : "Cliente creado con exito!";
+        String mensajeFlash = (cliente.getId() != null) ? messageSource.getMessage("text.cliente.flash.editar.success", null, locale) : messageSource.getMessage("text.cliente.flash.crear.success", null, locale);
         clienteService.save(cliente);
         status.setComplete();//con este metodo elimina el objeto cliente de la seccion es buena practica para no colocar en el html hidden id
         flash.addFlashAttribute("success", mensajeFlash);//metodo para mostrar mensajes al ejecutar una accion en los botones
@@ -216,16 +218,17 @@ public class ClienteController {
     //controlador para eliminar un elemento de la lista
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/eliminar/{id}")
-    public String eliminar(@PathVariable Long id, RedirectAttributes flash) {
+    public String eliminar(@PathVariable Long id, RedirectAttributes flash, Locale locale) {
         if (id > 0) {
             //para eliminar una imagen se debe primero tener el cliente
             Cliente cliente = clienteService.findOne(id);
             clienteService.delete(id);//metodo eliminar en jpaRepository
-            flash.addFlashAttribute("success", "Cliente Eliminado con exito");
+            flash.addFlashAttribute("success", messageSource.getMessage("text.cliente.flash.eliminar.success", null, locale));
             //imagen
 
             if (uploadFileService.delete(cliente.getFoto())) {
-                flash.addFlashAttribute("info", "Foto " + cliente.getFoto() + " eliminada con exito!");
+                String mensajeFotoEliminar = String.format(messageSource.getMessage("text.cliente.flash.foto.eliminar.success", null, locale), cliente.getFoto());
+                flash.addFlashAttribute("info", mensajeFotoEliminar);
             }
 
         }
