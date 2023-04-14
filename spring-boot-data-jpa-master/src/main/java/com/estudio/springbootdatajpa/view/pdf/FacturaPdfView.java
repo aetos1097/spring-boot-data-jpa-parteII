@@ -69,8 +69,8 @@ public class FacturaPdfView extends AbstractPdfView {
 
 
         tabla.addCell(cell);
-        tabla.addCell("Nombre: " + factura.getCliente().getNombre() + " " + factura.getCliente().getApellido());
-        tabla.addCell("Correo: " + factura.getCliente().getEmail());
+        tabla.addCell(mensajes.getMessage("text.factura.cliente.nombre")+" " +factura.getCliente().getNombre() + " " + factura.getCliente().getApellido());
+        tabla.addCell(mensajes.getMessage("text.factura.cliente.email")+" " +factura.getCliente().getEmail());
 
         PdfPTable tabla2 = new PdfPTable(1);
         tabla2.setSpacingAfter(20);
