@@ -22,7 +22,7 @@ import java.awt.*;
 import java.util.Locale;
 import java.util.Map;
 
-@Component("factura/ver")
+@Component("factura/ver.pdf")
 public class FacturaPdfView extends AbstractPdfView {
 
     @Autowired
