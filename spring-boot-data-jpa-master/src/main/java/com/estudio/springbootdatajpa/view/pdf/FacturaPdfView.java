@@ -38,7 +38,7 @@ public class FacturaPdfView extends AbstractPdfView {
 
         Locale locale = localeResolver.resolveLocale(request);
 
-        //segunda forma para apsar parametros a la traduccion:
+        //segunda forma para pasar parametros a la traduccion:
         MessageSourceAccessor mensajes = getMessageSourceAccessor();//maneja el locale por debajo
 
         if (factura == null) {
