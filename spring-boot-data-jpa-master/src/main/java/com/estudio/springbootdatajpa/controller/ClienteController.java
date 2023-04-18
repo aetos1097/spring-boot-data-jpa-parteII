@@ -88,6 +88,7 @@ public class ClienteController {
                          HttpServletRequest request,
                          Locale locale) {
 
+
         //validacion de autenticacion
         if (authentication != null) {
             logger.info("Hola usuario autenticado, tu username es: ".concat(authentication.getName()));
@@ -99,25 +100,28 @@ public class ClienteController {
         } else {
             logger.info("Hola usuario ".concat(auth.getName()).concat(" No tienes acceso"));
         }
-        SecurityContextHolderAwareRequestWrapper securityContext= new SecurityContextHolderAwareRequestWrapper(request,"ROLE_");
-        if(securityContext.isUserInRole("ADMIN")){
+        SecurityContextHolderAwareRequestWrapper securityContext = new SecurityContextHolderAwareRequestWrapper(request, "ROLE_");
+        if (securityContext.isUserInRole("ADMIN")) {
             logger.info("Forma:SecurityContextHolderAwareRequestWrapper Hola usuario ".concat(auth.getName()).concat(" tienes acceso"));
-        }else{
+        } else {
             logger.info("Forma:SecurityContextHolderAwareRequestWrapper Hola usuario ".concat(auth.getName()).concat(" No tienes acceso"));
 
         }
 
-        /*se coloca como paramtro de entrada @RequestParam(name="page", defaultValue="0")int page
+        /*se coloca como parametro de entrada @RequestParam(name="page", defaultValue="0")int page
         para la paginacion al momento de listar*/
-        Pageable pageRequest = PageRequest.of(page, 5);/*se importa la interfaz y con el metodo  PageRequest.of(page,5)
+            Pageable pageRequest = PageRequest.of(page, 5);/*se importa la interfaz y con el metodo  PageRequest.of(page,5)
         Damos el parametro de entrada page y cuantos elementos queremos mostrar(0)
         */
-        Page<Cliente> clientes = clienteService.findAll(pageRequest);//realizamos el servicio de filtrado
-        PageRender<Cliente> pageRender = new PageRender<>("/listar", clientes);
+            Page<Cliente> clientes = clienteService.findAll(pageRequest);//realizamos el servicio de filtrado
+            PageRender<Cliente> pageRender = new PageRender<>("/listar", clientes);
 
-        model.addAttribute("titulo", messageSource.getMessage("text.cliente.listar.titulo", null, locale));
-        model.addAttribute("clientes", clientes);
-        model.addAttribute("page", pageRender);
+            model.addAttribute("titulo", messageSource.getMessage("text.cliente.listar.titulo", null, locale));
+            model.addAttribute("clientes", clientes);
+            model.addAttribute("page", pageRender);
+
+
+
         // ya no se usa esta linea porque se quiere traer pero paginar los clientes model.addAttribute("clientes",clienteService.findAll());
         return "listar";
     }
@@ -153,7 +157,7 @@ public class ClienteController {
     @Secured("ROLE_ADMIN")
     //agregar o editar un elemento
     @GetMapping("/form/{id}")
-    public String editar(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash,Locale locale) {
+    public String editar(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash, Locale locale) {
         Cliente cliente = null;
         //validamos que el id sea mayor 0
         if (id > 0) {
