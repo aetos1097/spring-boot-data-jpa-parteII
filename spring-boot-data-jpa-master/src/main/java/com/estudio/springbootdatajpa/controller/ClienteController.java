@@ -83,7 +83,7 @@ public class ClienteController {
     //listar los elementos
     @Secured("ROLE_USER")
     @RequestMapping(value = {"/listar", "/"}, method = RequestMethod.GET)//lo mismo que el get
-    public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model,
+    public String listar(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "format", defaultValue = "html") String format, Model model,
                          Authentication authentication,
                          HttpServletRequest request,
                          Locale locale) {
@@ -107,7 +107,7 @@ public class ClienteController {
             logger.info("Forma:SecurityContextHolderAwareRequestWrapper Hola usuario ".concat(auth.getName()).concat(" No tienes acceso"));
 
         }
-
+        if (format.equals("html")) {
         /*se coloca como parametro de entrada @RequestParam(name="page", defaultValue="0")int page
         para la paginacion al momento de listar*/
             Pageable pageRequest = PageRequest.of(page, 5);/*se importa la interfaz y con el metodo  PageRequest.of(page,5)
@@ -119,7 +119,10 @@ public class ClienteController {
             model.addAttribute("titulo", messageSource.getMessage("text.cliente.listar.titulo", null, locale));
             model.addAttribute("clientes", clientes);
             model.addAttribute("page", pageRender);
+        } else {
+            model.addAttribute("clientes", clienteService.findAll());
 
+        }
 
 
         // ya no se usa esta linea porque se quiere traer pero paginar los clientes model.addAttribute("clientes",clienteService.findAll());
