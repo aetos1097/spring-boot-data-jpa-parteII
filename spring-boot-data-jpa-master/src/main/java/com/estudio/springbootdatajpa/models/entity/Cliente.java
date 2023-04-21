@@ -20,7 +20,7 @@ public class Cliente implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)//indica que sera autoincrementable el id
     private Long id;//este atributo es la llave
     //se puede colocar la anotacion @Column para cambiar el nombre,tamanio,nullable(cutomizar) a una variable al de la tabla en la db
-    @NotEmpty//esta anotacion valida que no este vacion peor SOLO con Strings
+    @NotEmpty//esta anotacion valida que no este vacio pero SOLO con Strings
     //@Size(min=1,max=20) permite darle un tamanio al campo de caracteres
     private String nombre;
 

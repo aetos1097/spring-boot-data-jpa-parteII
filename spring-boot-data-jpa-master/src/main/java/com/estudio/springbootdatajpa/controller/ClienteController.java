@@ -41,10 +41,7 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Clase donde iran los controladores
@@ -79,6 +76,11 @@ public class ClienteController {
         return "ver";
     }
 
+    //metodo que no devuelve un html si no un formato json
+    @GetMapping("/listar-rest")
+   public @ResponseBody List<Cliente> listarRest(){
+        return clienteService.findAll();
+   }
     // ya no inyectamos el Dao si no la fachada IClienteService private IClienteDao clienteDao;
     //listar los elementos
     @Secured("ROLE_USER")
