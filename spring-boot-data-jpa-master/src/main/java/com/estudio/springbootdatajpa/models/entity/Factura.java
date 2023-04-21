@@ -1,5 +1,6 @@
 package com.estudio.springbootdatajpa.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 
@@ -24,6 +25,7 @@ public class Factura implements Serializable {//toda clas entitiy como buena pra
     @ManyToOne(fetch=FetchType.LAZY)/*muchas facturas a un cliente es decir many=desde facturas a one=cliente
     es decir muchas facturas pueden tener un cliente
     fetch=FetchType.LAZY ayuda a que la consulta traiga solo lo necesario y no todos los datos*/
+    @JsonBackReference//se omitira de la serializacion
     private Cliente cliente;
 
      @OneToMany(fetch=FetchType.LAZY,cascade=CascadeType.ALL)

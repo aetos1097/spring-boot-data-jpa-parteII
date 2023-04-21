@@ -1,6 +1,7 @@
 package com.estudio.springbootdatajpa.models.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
@@ -34,6 +35,7 @@ public class Cliente implements Serializable {
     @Column(name = "create_at")
     @Temporal(TemporalType.DATE)//solamente para fechas, indica el formato en que se gurdara esta fecha en la tabla
     @DateTimeFormat(pattern = "yyyy-MM-dd") //asignamos el aptron de fecha como lo deseemos
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date createAt;
     /*
     Ya no sera necesario este metodo porque se creara un nuevo campo en el html
@@ -50,7 +52,7 @@ public class Cliente implements Serializable {
     mappedBy="cliente" anuncia que sera bidireccional es decir que en facturas hay un elemento cliente y en cliente hay un elemento facturas
     y al mismo tiempo crea la llave foranea cliente_id en facturas
     cascade=CascadeType.ALL-> ayuda a que las operaciones relacionadas a este campo se pasen asus atributos hijos*/
-    @JsonIgnore
+    @JsonManagedReference// para que se muestre la factura de manera unidireccional, debemos colocar en facturas su contraparte
     private List<Factura> facturas;
 
     public Cliente() {
