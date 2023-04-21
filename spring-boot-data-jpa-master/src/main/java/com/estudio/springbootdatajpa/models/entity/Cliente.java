@@ -1,5 +1,6 @@
 package com.estudio.springbootdatajpa.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
@@ -49,6 +50,7 @@ public class Cliente implements Serializable {
     mappedBy="cliente" anuncia que sera bidireccional es decir que en facturas hay un elemento cliente y en cliente hay un elemento facturas
     y al mismo tiempo crea la llave foranea cliente_id en facturas
     cascade=CascadeType.ALL-> ayuda a que las operaciones relacionadas a este campo se pasen asus atributos hijos*/
+    @JsonIgnore
     private List<Factura> facturas;
 
     public Cliente() {

@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -67,7 +68,15 @@ public class MvcConfig implements WebMvcConfigurer {
     //toca registrar este bean en la aplicacion
 
     @Override
-    public void addInterceptors(InterceptorRegistry registry) {
+    public void addInterceptors(InterceptorRegistry registry) {//para cargar lso indiomas antes que los controladores
         registry.addInterceptor(localeChangeInterceptor());//recordar que se toma el objeto devuelto por el bean
+    }
+    //bean para convertir un objeto en xml
+    @Bean
+    public Jaxb2Marshaller jaxb2Marshaller(){
+        Jaxb2Marshaller marshaller = new Jaxb2Marshaller();//creamos nuestro objeto
+        marshaller.setClassesToBeBound(new Class[]{com.estudio.springbootdatajpa.view.xml.ClienteList.class});//clases que vamos a convertir
+        //esta sera nuestra clase root que tendra los elementos cliente
+        return marshaller;
     }
 }

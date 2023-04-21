@@ -3,6 +3,7 @@ package com.estudio.springbootdatajpa.models.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 
+import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -70,6 +71,7 @@ public class Factura implements Serializable {//toda clas entitiy como buena pra
         this.createAt = createAt;
     }
 
+    @XmlTransient//omite este atribbuto en la serializacion, no lo incluye en el xml
     public Cliente getCliente() {
         return cliente;
     }
